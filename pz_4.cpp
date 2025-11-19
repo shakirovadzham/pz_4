@@ -4,253 +4,254 @@ using namespace std;
 
 class DynamicArray {
 protected:
-    int *data;
-    int size;
+    int *elements;
+    int arraySize;
 
 public:
-    DynamicArray(int arrSize) {
-        if (arrSize < 0) {
-            cout << "Error: Size cannot be negative" << endl;
-            size = 0;
-            data = nullptr;
+    DynamicArray(int initialSize) {
+        if (initialSize < 0) {
+            cout << "Error: Array size cannot be negative" << endl;
+            arraySize = 0;
+            elements = nullptr;
             return;
         }
-        size = arrSize;
-        data = new int[size];
-        for (int i = 0; i < size; i++) {
-            data[i] = 0; 
+        arraySize = initialSize;
+        elements = new int[arraySize];
+        for (int i = 0; i < arraySize; i++) {
+            elements[i] = 0; 
         }
     }
 
-    DynamicArray(const DynamicArray& other) {
-        size = other.size;
-        data = new int[size];
-        for (int i = 0; i < size; i++) {
-            data[i] = other.data[i];
+    DynamicArray(const DynamicArray& source) {
+        arraySize = source.arraySize;
+        elements = new int[arraySize];
+        for (int i = 0; i < arraySize; i++) {
+            elements[i] = source.elements[i];
         }
     }
 
     ~DynamicArray() {
-        delete[] data;
+        delete[] elements;
     }
 
-    void setValue(int index, int value) {
-        if (0 <= index && index < size) {
-            if (-100 <= value && value <= 100) {
-                data[index] = value;
+    void assignElement(int position, int newValue) {
+        if (0 <= position && position < arraySize) {
+            if (-100 <= newValue && newValue <= 100) {
+                elements[position] = newValue;
             } else {
-                cout << "Error: meaning " << value << " goes beyond [-100, 100]" << endl;
+                cout << "Error: Value " << newValue << " exceeds allowed range [-100, 100]" << endl;
             }
         } else {
-            cout << "Error: index " << index << " goes beyond the boundaries of the array" << endl;
+            cout << "Error: Position " << position << " is outside array bounds" << endl;
         }
     }
 
-    int getValue(int index) {
-        if (0 <= index && index < size) {
-            return data[index];
+    int retrieveElement(int position) {
+        if (0 <= position && position < arraySize) {
+            return elements[position];
         } else {
-            cout << "Error: index " << index << " oes beyond the boundaries of the array" << endl;
+            cout << "Error: Position " << position << " is outside array bounds" << endl;
             return 0;
         }
     }
 
-    void print() {
-        for (int i = 0; i < size; i++) {
-            cout << data[i] << " ";
+    void displayContents() {
+        for (int i = 0; i < arraySize; i++) {
+            cout << elements[i] << " ";
         }
         cout << endl;
     }
 
-    void addValue(int value) {
-        if (-100 <= value && value <= 100) {
-            int* newData = new int[size + 1];
+    void appendElement(int newValue) {
+        if (-100 <= newValue && newValue <= 100) {
+            int* extendedArray = new int[arraySize + 1];
             
-            for (int i = 0; i < size; i++) {
-                newData[i] = data[i];
+            for (int i = 0; i < arraySize; i++) {
+                extendedArray[i] = elements[i];
             }
             
-            newData[size] = value;
+            extendedArray[arraySize] = newValue;
             
-            delete[] data;
-            data = newData;
-            size += 1;
+            delete[] elements;
+            elements = extendedArray;
+            arraySize += 1;
         } else {
-            cout << "Error: meaning " << value << " oes beyond the boundaries of the array" << endl;
+            cout << "Error: Value " << newValue << " exceeds allowed range [-100, 100]" << endl;
         }
     }
 
-    DynamicArray add(const DynamicArray& other) {
-        int maxSize = (size > other.size) ? size : other.size;
-        DynamicArray result(maxSize);
+    DynamicArray combineArrays(const DynamicArray& secondArray) {
+        int largerSize = (arraySize > secondArray.arraySize) ? arraySize : secondArray.arraySize;
+        DynamicArray combinedArray(largerSize);
         
-        for (int i = 0; i < maxSize; i++) {
-            int val1 = (i < size) ? data[i] : 0;
-            int val2 = (i < other.size) ? other.data[i] : 0;
-            result.data[i] = val1 + val2;
+        for (int i = 0; i < largerSize; i++) {
+            int firstVal = (i < arraySize) ? elements[i] : 0;
+            int secondVal = (i < secondArray.arraySize) ? secondArray.elements[i] : 0;
+            combinedArray.elements[i] = firstVal + secondVal;
         }
         
-        return result;
+        return combinedArray;
     }
 
-    DynamicArray subtract(const DynamicArray& other) {
-        int maxSize = (size > other.size) ? size : other.size;
-        DynamicArray result(maxSize);
+    DynamicArray subtractArrays(const DynamicArray& secondArray) {
+        int largerSize = (arraySize > secondArray.arraySize) ? arraySize : secondArray.arraySize;
+        DynamicArray differenceArray(largerSize);
         
-        for (int i = 0; i < maxSize; i++) {
-            int val1 = (i < size) ? data[i] : 0;
-            int val2 = (i < other.size) ? other.data[i] : 0;
-            result.data[i] = val1 - val2;
+        for (int i = 0; i < largerSize; i++) {
+            int firstVal = (i < arraySize) ? elements[i] : 0;
+            int secondVal = (i < secondArray.arraySize) ? secondArray.elements[i] : 0;
+            differenceArray.elements[i] = firstVal - secondVal;
         }
         
-        return result;
+        return differenceArray;
     }
 
-    int getSize() const {
-        return size;
+    int getArraySize() const {
+        return arraySize;
     }
 };
 
-
-class Func : public DynamicArray {
+class ArrayAnalyzer : public DynamicArray {
 public:
     using DynamicArray::DynamicArray;
     
-    void printFunc() {
-        cout << "The median value is being calculated" << endl;
+    void showCalculationMessage() {
+        cout << "Calculating median value..." << endl;
     }
 
-    void printMedian() {
-        printFunc();
-        Func tmp(*this);
-        sort(tmp.data, tmp.data + size);
-        if (size == 0) {
-            cout << "The array is empty" << endl;
-        }
-        double mediana;
-        if (size % 2 == 0) {
-            mediana = (data[size / 2 - 1] + data[size / 2]) / 2.0;
-        } else {
-            mediana = data[size / 2];
-        }
-        cout << "Median number: " << mediana << endl;
-    }
-
-    void printAverage() {
-        if (size == 0) {
-            cout << "The array is empty" << endl;
-        }
-        double average = 0.0;
-        for (int i = 0; i < size; i++) { 
-            average += data[i];
-        }
-        cout << "The average value is: " << average / size << endl;
-    }
-
-    int minValue() {
-        if (size == 0) {
-            cout << "The array is empty" << endl;
+    void displayMedian() {
+        showCalculationMessage();
+        ArrayAnalyzer temporaryCopy(*this);
+        sort(temporaryCopy.elements, temporaryCopy.elements + temporaryCopy.arraySize);
+        if (temporaryCopy.arraySize == 0) {
+            cout << "Array is empty" << endl;
             return;
         }
-        int min_value = data[0];
-        for (int i = 1; i < size; i++) {
-            if (min_value > data[i]) {
-                min_value = data[i];
-            }
+        double medianResult;
+        if (temporaryCopy.arraySize % 2 == 0) {
+            medianResult = (temporaryCopy.elements[temporaryCopy.arraySize / 2 - 1] + 
+                           temporaryCopy.elements[temporaryCopy.arraySize / 2]) / 2.0;
+        } else {
+            medianResult = temporaryCopy.elements[temporaryCopy.arraySize / 2];
         }
-        cout << "The minimum value is " << min_value << endl;
-
-        return min_value;
+        cout << "Median value: " << medianResult << endl;
     }
 
-    int maxValue() {
-        if (size == 0) {
-            cout << "The array is empty" << endl;
+    void displayAverage() {
+        if (arraySize == 0) {
+            cout << "Array is empty" << endl;
+            return;
+        }
+        double sum = 0.0;
+        for (int i = 0; i < arraySize; i++) { 
+            sum += elements[i];
+        }
+        cout << "Average value: " << sum / arraySize << endl;
+    }
+
+    int findMinimum() {
+        if (arraySize == 0) {
+            cout << "Array is empty" << endl;
             return 0;
         }
-        int max_value = data[0];
-        for (int i = 1; i < size; i++) {
-            if (max_value < data[i]) {
-                max_value = data[i];
+        int minimum = elements[0];
+        for (int i = 1; i < arraySize; i++) {
+            if (minimum > elements[i]) {
+                minimum = elements[i];
             }
         }
-        cout << "The maximum value is " << max_value << endl;
+        cout << "Minimum value: " << minimum << endl;
+        return minimum;
+    }
 
-        return max_value;
+    int findMaximum() {
+        if (arraySize == 0) {
+            cout << "Array is empty" << endl;
+            return 0;
+        }
+        int maximum = elements[0];
+        for (int i = 1; i < arraySize; i++) {
+            if (maximum < elements[i]) {
+                maximum = elements[i];
+            }
+        }
+        cout << "Maximum value: " << maximum << endl;
+        return maximum;
     }
 };
 
 int main() {
-    cout << "Creating an array A of size 3:" << endl;
-    DynamicArray arrA(3);
-    arrA.setValue(0, 10);
-    arrA.setValue(1, 20);
-    arrA.setValue(2, 30);
-    cout << "array A: ";
-    arrA.print();
+    cout << "Creating array A with 3 elements:" << endl;
+    DynamicArray arrayA(3);
+    arrayA.assignElement(0, 10);
+    arrayA.assignElement(1, 20);
+    arrayA.assignElement(2, 30);
+    cout << "Array A: ";
+    arrayA.displayContents();
 
-    cout << "\nCreating an array B of size 5 " << endl;
-    DynamicArray arrB(5);
-    arrB.setValue(0, 5);
-    arrB.setValue(1, 15);
-    arrB.setValue(2, 25);
-    arrB.setValue(3, 35);
-    arrB.setValue(4, 45);
+    cout << "\nCreating array B with 5 elements:" << endl;
+    DynamicArray arrayB(5);
+    arrayB.assignElement(0, 5);
+    arrayB.assignElement(1, 15);
+    arrayB.assignElement(2, 25);
+    arrayB.assignElement(3, 35);
+    arrayB.assignElement(4, 45);
     cout << "Array B: ";
-    arrB.print();
+    arrayB.displayContents();
 
-    cout << "\nTesting the copy constructor:" << endl;
-    DynamicArray arrC = arrA;
-    cout << "Массив C (копия A): ";
-    arrC.print();
+    cout << "\nTesting copy constructor:" << endl;
+    DynamicArray arrayC = arrayA;
+    cout << "Array C (copy of A): ";
+    arrayC.displayContents();
 
-    cout << "\nAdding the value 40 to array A:" << endl;
-    arrA.addValue(40);
+    cout << "\nAdding value 40 to array A:" << endl;
+    arrayA.appendElement(40);
     cout << "Array A after addition: ";
-    arrA.print();
+    arrayA.displayContents();
 
-    cout << "\nAddition of arrays A and B:" << endl;
-    DynamicArray sum = arrA.add(arrB);
+    cout << "\nAdding arrays A and B:" << endl;
+    DynamicArray sumArray = arrayA.combineArrays(arrayB);
     cout << "A + B: ";
-    sum.print();
+    sumArray.displayContents();
 
     cout << "\nSubtracting arrays A and B:" << endl;
-    DynamicArray diff = arrA.subtract(arrB);
+    DynamicArray diffArray = arrayA.subtractArrays(arrayB);
     cout << "A - B: ";
-    diff.print();
+    diffArray.displayContents();
 
     cout << "\nTesting error handling:" << endl;
-    arrA.setValue(10, 50);
-    arrA.setValue(0, 150);
+    arrayA.assignElement(10, 50);
+    arrayA.assignElement(0, 150);
 
-    cout << "\n=== ARRAY ANALYSIS ===" << endl;
+    cout << "\n=== ARRAY STATISTICS ===" << endl;
     
-    cout << "\nAnalysis of array A:" << endl;
+    cout << "\nAnalyzing array A:" << endl;
     
-    Func func1(3);
-    func1.setValue(0, 10);
-    func1.setValue(1, 20);
-    func1.setValue(2, 30);
+    ArrayAnalyzer analyzer1(3);
+    analyzer1.assignElement(0, 10);
+    analyzer1.assignElement(1, 20);
+    analyzer1.assignElement(2, 30);
     
-    cout << "Func1 array: ";
-    func1.print();
-    func1.printMedian();
-    func1.printAverage();
-    func1.minValue();
-    func1.maxValue();
+    cout << "Analyzer1 array: ";
+    analyzer1.displayContents();
+    analyzer1.displayMedian();
+    analyzer1.displayAverage();
+    analyzer1.findMinimum();
+    analyzer1.findMaximum();
     
-    Func func2(5);
-    func2.setValue(0, 5);
-    func2.setValue(1, 15);
-    func2.setValue(2, 25);
-    func2.setValue(3, 35);
-    func2.setValue(4, 45);
+    ArrayAnalyzer analyzer2(5);
+    analyzer2.assignElement(0, 5);
+    analyzer2.assignElement(1, 15);
+    analyzer2.assignElement(2, 25);
+    analyzer2.assignElement(3, 35);
+    analyzer2.assignElement(4, 45);
     
-    cout << "\nFunc2 array: ";
-    func2.print();
-    func2.printMedian();
-    func2.printAverage();
-    func2.minValue();
-    func2.maxValue();
+    cout << "\nAnalyzer2 array: ";
+    analyzer2.displayContents();
+    analyzer2.displayMedian();
+    analyzer2.displayAverage();
+    analyzer2.findMinimum();
+    analyzer2.findMaximum();
 
     return 0;
+}
